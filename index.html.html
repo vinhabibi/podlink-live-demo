@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PodLink — Adana Student Pods</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14182B;
+  --paper:#FFFFFF;
+  --surface:#F4F6F7;
+  --surface-2:#ECEFF0;
+  --teal:#1B6E6B;
+  --teal-dark:#124E4C;
+  --teal-tint:#E7F1F0;
+  --amber:#F4A93B;
+  --amber-dark:#C97F12;
+  --amber-tint:#FDF1DD;
+  --slate:#6B7280;
+  --slate-light:#9AA1AC;
+  --line:#E3E6E9;
+  --success:#2F9E68;
+  --success-tint:#E5F4EC;
+  --danger:#D14343;
+  --danger-tint:#FBE9E9;
+  --warning:#C97F12;
+  --warning-tint:#FDF1DD;
+  --radius-pod: 26px 26px 26px 6px;
+  --radius-pod-sm: 16px 16px 16px 4px;
+  --shadow-sm: 0 1px 2px rgba(20,24,43,0.06), 0 1px 1px rgba(20,24,43,0.04);
+  --shadow-md: 0 8px 24px rgba(20,24,43,0.08);
+  --shadow-lg: 0 20px 48px rgba(20,24,43,0.16);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+  font-size:15px;
+  line-height:1.55;
+}
+h1,h2,h3,h4{
+  font-family:"Fraunces","Georgia",serif;
+  margin:0;
+  color:var(--ink);
+  letter-spacing:-0.01em;
+}
+p{margin:0;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+.mono{font-family:"IBM Plex Mono","Courier New",monospace;}
+img,svg{display:block;}
+.visually-hidden{position:absolute;left:-9999px;}
+
+/* ---------- layout helpers ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+.view{display:none;}
+.view.active{display:block;}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--teal);
+}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 24px;border-radius:999px;font-size:14px;font-weight:600;
+  border:1px solid transparent; transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{background:var(--teal);color:#fff;box-shadow:var(--shadow-sm);}
+.btn-primary:hover{background:var(--teal-dark);}
+.btn-amber{background:var(--amber);color:var(--ink);}
+.btn-amber:hover{background:var(--amber-dark);color:#fff;}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);}
+.btn-ghost:hover{border-color:var(--ink);}
+.btn-sm{padding:8px 16px;font-size:13px;border-radius:999px;}
+.btn-block{width:100%;}
+
+.pod-card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:var(--radius-pod);
+  box-shadow:var(--shadow-sm);
+}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;
+}
+.badge-success{background:var(--success-tint);color:var(--success);}
+.badge-warning{background:var(--warning-tint);color:var(--warning);}
+.badge-danger{background:var(--danger-tint);color:var(--danger);}
+.badge-slate{background:var(--surface-2);color:var(--slate);}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none;}
+
+.icon-circle{
+  width:46px;height:46px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;flex:none;
+}
+.icon-circle svg{width:22px;height:22px;}
+
+/* ---------- LANDING ---------- */
+#view-landing{background:var(--paper);}
+.nav-public{
+  position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.nav-public .wrap{display:flex;align-items:center;justify-content:space-between;height:78px;}
+.logo{display:flex;align-items:center;gap:10px;font-family:"Fraunces",serif;font-weight:700;font-size:21px;}
+.logo .mark{width:30px;height:30px;border-radius:9px 9px 9px 3px;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;font-family:"IBM Plex Mono",monospace;}
+.nav-links{display:flex;gap:32px;font-size:14px;font-weight:500;color:var(--slate);}
+.nav-links a:hover{color:var(--ink);}
+.nav-actions{display:flex;gap:12px;align-items:center;}
+
+.hero{padding:96px 0 80px;}
+.hero-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:64px;align-items:center;}
+.hero h1{font-size:52px;line-height:1.07;font-weight:600;margin:18px 0 22px;}
+.hero h1 em{font-style:normal;color:var(--teal);}
+.hero p.lead{font-size:18px;color:var(--slate);max-width:480px;margin-bottom:32px;}
+.hero-ctas{display:flex;gap:14px;margin-bottom:36px;}
+.hero-meta{display:flex;gap:28px;font-size:13px;color:var(--slate-light);}
+.hero-meta b{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:15px;display:block;}
+
+.hero-visual{position:relative;}
+.mock-card{
+  background:var(--ink);color:#fff;border-radius:var(--radius-pod);
+  padding:28px;box-shadow:var(--shadow-lg);position:relative;z-index:2;
+}
+.mock-card .mc-label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#9FB8B6;margin-bottom:10px;}
+.mock-card .mc-amount{font-family:"IBM Plex Mono",monospace;font-size:38px;font-weight:600;margin-bottom:4px;}
+.mock-card .mc-sub{font-size:13px;color:#A9AFC1;margin-bottom:22px;}
+.mock-card .mc-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid rgba(255,255,255,0.1);font-size:13px;}
+.mock-float{
+  position:absolute;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-pod-sm);
+  padding:14px 18px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;z-index:3;
+}
+.mock-float.f1{top:-22px;right:18px;}
+.mock-float.f2{bottom:-26px;left:-30px;}
+.mock-float .dot{width:9px;height:9px;}
+
+.section{padding:88px 0;}
+.section.tint{background:var(--surface);}
+.section-head{max-width:600px;margin-bottom:48px;}
+.section-head h2{font-size:34px;font-weight:600;margin:12px 0 14px;}
+.section-head p{color:var(--slate);font-size:16px;}
+
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+.feature-card{padding:30px;}
+.feature-card h3{font-size:18px;font-weight:600;margin:18px 0 10px;font-family:"Inter",sans-serif;}
+.feature-card p{font-size:14px;color:var(--slate);}
+
+.split-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.audience-card{padding:36px;}
+.audience-card.for-res{background:var(--teal-tint);border-color:transparent;}
+.audience-card.for-admin{background:var(--amber-tint);border-color:transparent;}
+.audience-card .eyebrow{margin-bottom:8px;}
+.audience-card h3{font-size:24px;margin-bottom:18px;font-weight:600;}
+.audience-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:13px;}
+.audience-list li{display:flex;gap:10px;font-size:14px;align-items:flex-start;}
+.audience-list svg{flex:none;margin-top:2px;width:16px;height:16px;}
+
+.cta-band{background:var(--ink);color:#fff;padding:88px 0;text-align:center;}
+.cta-band h2{color:#fff;font-size:36px;font-weight:600;margin-bottom:16px;}
+.cta-band p{color:#A9AFC1;font-size:16px;margin-bottom:34px;}
+.cta-band .hero-ctas{justify-content:center;}
+
+footer.site-footer{background:var(--ink);color:#A9AFC1;padding:56px 0 28px;}
+footer.site-footer .foot-top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:24px;}
+footer.site-footer .logo{color:#fff;}
+footer.site-footer .foot-cols{display:flex;gap:56px;}
+footer.site-footer .foot-cols div{display:flex;flex-direction:column;gap:10px;font-size:13px;}
+footer.site-footer .foot-cols strong{color:#fff;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;font-family:"IBM Plex Mono",monospace;margin-bottom:4px;}
+.social-row{display:flex !important;flex-direction:row !important;gap:10px;}
+.social-row a{width:36px;height:36px;border-radius:11px 11px 11px 3px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;}
+.social-row a:hover{background:var(--teal);}
+.foot-bottom{display:flex;justify-content:space-between;font-size:12px;color:#6E7488;}
+
+/* ---------- APP SHELL (resident + admin) ---------- */
+.app-shell{display:flex;min-height:100vh;background:var(--surface);}
+.sidebar{
+  width:236px;flex:none;background:var(--ink);color:#fff;display:flex;flex-direction:column;
+  padding:24px 16px;position:sticky;top:0;height:100vh;
+}
+.sidebar .logo{color:#fff;margin-bottom:30px;padding:0 8px;font-size:18px;}
+.side-section-label{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#6E7488;padding:0 12px;margin:18px 0 8px;}
+.side-nav{display:flex;flex-direction:column;gap:2px;}
+.side-link{
+  display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;
+  font-size:13.5px;font-weight:500;color:#B6BBD0;border:none;background:transparent;width:100%;text-align:left;
+}
+.side-link svg{width:17px;height:17px;flex:none;opacity:0.85;}
+.side-link:hover{background:rgba(255,255,255,0.06);color:#fff;}
+.side-link.active{background:var(--teal);color:#fff;}
+.sidebar-foot{margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,0.1);}
+
+.app-main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.app-topbar{
+  height:74px;background:var(--paper);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:10;
+}
+.topbar-title h1{font-size:21px;font-weight:600;}
+.topbar-title span{font-size:12.5px;color:var(--slate-light);}
+.topbar-right{display:flex;align-items:center;gap:18px;}
+.user-chip{display:flex;align-items:center;gap:10px;}
+.avatar{width:36px;height:36px;border-radius:11px;background:var(--teal-tint);color:var(--teal-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+.user-chip .name{font-size:13.5px;font-weight:600;}
+.user-chip .role{font-size:11.5px;color:var(--slate-light);}
+.bell{width:38px;height:38px;border-radius:11px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;border:none;position:relative;}
+.bell svg{width:17px;height:17px;color:var(--slate);}
+.bell .ping{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--danger);border:1.5px solid var(--paper);}
+
+.app-content{padding:32px;flex:1;}
+.page{display:none;}
+.page.active{display:block;}
+.page-grid{display:grid;gap:20px;}
+.cols-2{grid-template-columns:1fr 1fr;}
+.cols-3{grid-template-columns:repeat(3,1fr);}
+.cols-4{grid-template-columns:repeat(4,1fr);}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:24px;}
+.card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--slate);margin-bottom:16px;}
+.card-title.row{display:flex;justify-content:space-between;align-items:center;}
+
+.kpi-card{padding:22px 24px;}
+.kpi-card .lbl{font-size:12.5px;color:var(--slate);margin-bottom:10px;font-weight:600;}
+.kpi-card .val{font-family:"IBM Plex Mono",monospace;font-size:27px;font-weight:600;}
+.kpi-card .delta{font-size:12px;margin-top:8px;font-weight:600;}
+.delta.up{color:var(--success);}
+.delta.down{color:var(--danger);}
+
+.balance-card{background:var(--ink);color:#fff;border-radius:var(--radius-pod);padding:28px;}
+.balance-card .mc-label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#9FB8B6;margin-bottom:10px;}
+.balance-card .mc-amount{font-family:"IBM Plex Mono",monospace;font-size:34px;font-weight:600;margin-bottom:4px;}
+.balance-card .mc-sub{font-size:13px;color:#A9AFC1;margin-bottom:20px;}
+.balance-card .btn-row{display:flex;gap:10px;}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:0.04em;color:var(--slate-light);font-weight:700;padding:0 12px 12px;border-bottom:1px solid var(--line);}
+td{padding:14px 12px;border-bottom:1px solid var(--line);}
+tr:last-child td{border-bottom:none;}
+.table-card{padding:8px 8px 4px;}
+.table-card .card-title{padding:16px 16px 12px;margin-bottom:0;}
+
+.list-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);}
+.list-row:last-child{border-bottom:none;}
+.list-row .meta{font-size:12px;color:var(--slate-light);margin-top:2px;}
+
+.form-row{margin-bottom:16px;}
+.form-row label{display:block;font-size:12.5px;font-weight:600;margin-bottom:7px;color:var(--ink);}
+.form-row input, .form-row select, .form-row textarea{
+  width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;background:var(--paper);
+}
+.form-row textarea{resize:vertical;min-height:84px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+.toggle{position:relative;width:42px;height:24px;border-radius:999px;background:var(--surface-2);flex:none;border:none;}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.2);transition:left .15s;}
+.toggle.on{background:var(--teal);}
+.toggle.on::after{left:21px;}
+
+.tabs{display:flex;gap:6px;background:var(--surface-2);padding:4px;border-radius:999px;width:fit-content;margin-bottom:22px;}
+.tab-btn{padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;border:none;background:transparent;color:var(--slate);}
+.tab-btn.active{background:var(--paper);color:var(--ink);box-shadow:var(--shadow-sm);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+.slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.slot{border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:12.5px;font-weight:600;}
+.slot.free{color:var(--success);}
+.slot.taken{color:var(--slate-light);background:var(--surface);}
+.slot .t{display:block;font-family:"IBM Plex Mono",monospace;font-size:14px;margin-bottom:4px;color:var(--ink);}
+
+.empty-note{font-size:13px;color:var(--slate-light);text-align:center;padding:18px 0;}
+
+.exit-link{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#B6BBD0;padding:10px 12px;}
+.exit-link:hover{color:#fff;}
+
+@media (max-width:980px){
+  .hero-grid, .split-cols, .cols-2, .cols-3, .cols-4{grid-template-columns:1fr;}
+  .feature-grid{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+  .sidebar{display:none;}
+  .hero h1{font-size:36px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ======================= LANDING PAGE ======================= -->
+<div class="view active" id="view-landing">
+
+  <nav class="nav-public">
+    <div class="wrap">
+      <div class="logo"><span class="mark">PL</span> PodLink</div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#audience">For residents &amp; staff</a>
+        <a href="#demo">Live demo</a>
+      </div>
+      <div class="nav-actions">
+        <button class="btn btn-ghost btn-sm" onclick="goTo('resident','dash')">Resident login</button>
+        <button class="btn btn-primary btn-sm" onclick="goTo('admin','overview')">Staff login</button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Built for Adana Student Pods</div>
+        <h1>One pod. One login.<br>Every part of <em>residence life</em> sorted.</h1>
+        <p class="lead">PodLink gives residents a single place to pay rent, book services, and raise complaints — and gives Adana Student Pods staff a dashboard to run the whole property without the WhatsApp chaos.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary" onclick="goTo('resident','dash')">View live demo — Resident</button>
+          <button class="btn btn-ghost" onclick="goTo('admin','overview')">View live demo — Staff</button>
+        </div>
+        <div class="hero-meta">
+          <div><b>11</b>resident modules</div>
+          <div><b>6</b>admin tools</div>
+          <div><b>1</b>shared platform</div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="mock-float f1"><span class="dot" style="color:var(--success)"></span> Rent paid on time</div>
+        <div class="mock-card">
+          <div class="mc-label">Wallet balance</div>
+          <div class="mc-amount">KSh 2,300</div>
+          <div class="mc-sub">Pod B-12 · Faith Wanjiru</div>
+          <div class="mc-row"><span>Rent due — 1 Jul</span><span class="mono">KSh 18,500</span></div>
+          <div class="mc-row"><span>Laundry slot</span><span class="mono">Today, 4:00 PM</span></div>
+          <button class="btn btn-amber btn-block" style="margin-top:18px;">Pay rent now</button>
+        </div>
+        <div class="mock-float f2">🧺 Laundrymart slot confirmed</div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section" id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Resident portal</div>
+        <h2>Everything a resident needs, minus the front-desk queue</h2>
+        <p>Six connected modules cover the moments residents actually deal with day to day.</p>
+      </div>
+      <div class="feature-grid">
+
+        <div class="pod-card feature-card">
+          <div class="icon-circle" style="background:var(--teal-tint);color:var(--teal-dark);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h18M3 7v11a2 2 0 002 2h14a2 2 0 002-2V7M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2"/></svg>
+          </div>
+          <h3>Wallet &amp; rent payments</h3>
+          <p>Top up, pay rent, and download receipts — with a full transaction history on demand.</p>
+        </div>
+
+        <div class="pod-card feature-card">
+          <div class="icon-circle" style="background:var(--amber-tint);color:var(--amber-dark);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9"/></svg>
+          </div>
+          <h3>My room &amp; lease</h3>
+          <p>Room type, amenities, and lease dates in one place — plus roommate details.</p>
+        </div>
+
+        <div class="pod-card feature-card">
+          <div class="icon-circle" style="background:var(--teal-tint);color:var(--teal-dark);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 20h5v-1a4 4 0 00-4-4h-1M9 20H4v-1a4 4 0 014-4h2a4 4 0 014 4v1M14 7a3 3 0 11-6 0 3 3 0 016 0zM21 7a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>
+          </div>
+          <h3>Guest invitations</h3>
+          <p>Invite a visitor, set their date, and let the front desk see it coming — no calls needed.</p>
+        </div>
+
+        <div class="pod-card feature-card">
+          <div class="icon-circle" style="background:var(--amber-tint);color:var(--amber-dark);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg>
+          </div>
+          <h3>Campus services</h3>
+          <p>Borrow equipment, book a laundry slot, and check the next shuttle — all in one tab.</p>
+        </div>
+
+        <div class="pod-card feature-card">
+          <div class="icon-circle" style="background:var(--teal-tint);color:var(--teal-dark);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4m0 4h.01M10.3 3.86L1.8 18a1 1 0 00.86 1.5h18.7a1 1 0 00.86-1.5L13.7 3.86a1 1 0 00-1.73 0z"/></svg>
+          </div>
+          <h3>Maintenance &amp; complaints</h3>
+          <p>Log a fault or report damage, then track it through to resolved — no chasing the office.</p>
+        </div>
+
+        <div class="pod-card feature-card">
+          <div class="icon-circle" style="background:var(--amber-tint);color:var(--amber-dark);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/></svg>
+          </div>
+          <h3>Notices &amp; community</h3>
+          <p>Property announcements plus quick links to the Adana socials residents already follow.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section tint" id="audience">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Two sides, one platform</div>
+        <h2>Built for residents day to day — and staff every month-end</h2>
+      </div>
+      <div class="split-cols">
+        <div class="pod-card audience-card for-res">
+          <div class="eyebrow">For residents</div>
+          <h3>A self-service home base</h3>
+          <ul class="audience-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal-dark)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> See rent and wallet balance the moment you log in</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal-dark)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Book laundry and equipment without walking to the office</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal-dark)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Track a maintenance ticket from "submitted" to "resolved"</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal-dark)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Invite guests in advance, on your own time</li>
+          </ul>
+        </div>
+        <div class="pod-card audience-card for-admin">
+          <div class="eyebrow" style="color:var(--amber-dark);">For Adana Student Pods staff</div>
+          <h3>A control room for the property</h3>
+          <ul class="audience-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-dark)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> See who's paid, who's pending, who's overdue — at a glance</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-dark)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Automate rent reminders and receipt generation</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-dark)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Assign and resolve tickets without losing the thread</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-dark)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Keep one directory of every resident on the property</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band" id="demo">
+    <div class="wrap">
+      <h2>See PodLink running, not just described</h2>
+      <p>Both views below are fully clickable — explore them the way a resident or a staff member would.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-amber" onclick="goTo('resident','dash')">Enter resident portal</button>
+        <button class="btn btn-ghost" style="border-color:#444;color:#fff;" onclick="goTo('admin','overview')">Enter admin dashboard</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="foot-top">
+        <div>
+          <div class="logo"><span class="mark">PL</span> PodLink</div>
+          <p style="max-width:260px;font-size:13px;margin-top:14px;">A resident management platform built for Adana Student Pods.</p>
+        </div>
+        <div class="foot-cols">
+          <div>
+            <strong>Platform</strong>
+            <a href="#features">Features</a>
+            <a href="#audience">For residents &amp; staff</a>
+            <a href="#demo">Live demo</a>
+          </div>
+          <div>
+            <strong>Follow Adana Student Pods</strong>
+            <div class="social-row">
+              <a href="#" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.5"/><circle cx="17.2" cy="6.8" r="1"/></svg></a>
+              <a href="#" aria-label="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 11-4.07-7.27L21 3l-1.2 4.1A8.46 8.46 0 0121 11.5z"/></svg></a>
+              <a href="#" aria-label="YouTube"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="5.5" width="18" height="13" rx="3.5"/><path d="M11 9.5l4 2.5-4 2.5z" fill="white" stroke="none"/></svg></a>
+              <a href="#" aria-label="TikTok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M16 3v9.5a3.5 3.5 0 11-3-3.46V9a6 6 0 106 6V8.5a5 5 0 003 1V6.5a5 5 0 01-3-3.5z"/></svg></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 Adana Student Pods. Design proposal demo — not a production system.</span>
+        <span>Designed by Vincent Kimutai &amp; Victory Kanakee</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ======================= RESIDENT PORTAL ======================= -->
+<div class="view" id="view-resident">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="mark">PL</span> PodLink</div>
+      <div class="side-section-label">Resident</div>
+      <nav class="side-nav" id="resident-nav">
+        <button class="side-link active" data-page="dash" onclick="goPage('resident','dash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Dashboard</button>
+        <button class="side-link" data-page="room" onclick="goPage('resident','room')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9"/></svg> My Room</button>
+        <button class="side-link" data-page="wallet" onclick="goPage('resident','wallet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h18M3 7v11a2 2 0 002 2h14a2 2 0 002-2V7M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2"/></svg> Wallet &amp; Payments</button>
+        <button class="side-link" data-page="guests" onclick="goPage('resident','guests')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 20h5v-1a4 4 0 00-4-4h-1M9 20H4v-1a4 4 0 014-4h2a4 4 0 014 4v1M14 7a3 3 0 11-6 0 3 3 0 016 0zM21 7a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg> Guest Invitations</button>
+        <button class="side-link" data-page="services" onclick="goPage('resident','services')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg> Services</button>
+        <button class="side-link" data-page="tickets" onclick="goPage('resident','tickets')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4m0 4h.01M10.3 3.86L1.8 18a1 1 0 00.86 1.5h18.7a1 1 0 00.86-1.5L13.7 3.86a1 1 0 00-1.73 0z"/></svg> Maintenance &amp; Complaints</button>
+        <button class="side-link" data-page="notices" onclick="goPage('resident','notices')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/></svg> Notices &amp; Community</button>
+        <button class="side-link" data-page="profile" onclick="goPage('resident','profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg> Profile Settings</button>
+      </nav>
+      <div class="sidebar-foot">
+        <a class="exit-link" href="#" onclick="goTo('landing')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 19l-7-7 7-7M3 12h18"/></svg> Exit demo</a>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <div class="app-topbar">
+        <div class="topbar-title" id="resident-title"><h1>Dashboard</h1><span>Pod B-12 · Block B</span></div>
+        <div class="topbar-right">
+          <button class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg><span class="ping"></span></button>
+          <div class="user-chip"><div class="avatar">FW</div><div><div class="name">Faith Wanjiru</div><div class="role">Resident</div></div></div>
+        </div>
+      </div>
+
+      <div class="app-content">
+
+        <!-- DASHBOARD -->
+        <div class="page active" id="res-dash">
+          <div class="page-grid cols-3" style="margin-bottom:20px;">
+            <div class="balance-card" style="grid-column:span 1;">
+              <div class="mc-label">Rent due 1 July</div>
+              <div class="mc-amount">KSh 18,500</div>
+              <div class="mc-sub">Wallet balance: KSh 2,300</div>
+              <div class="btn-row"><button class="btn btn-amber btn-sm" onclick="goPage('resident','wallet')">Pay rent</button><button class="btn btn-ghost btn-sm" style="border-color:#444;color:#fff;" onclick="goPage('resident','wallet')">Top up wallet</button></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Open tickets</div>
+              <div class="kpi-card" style="padding:0;"><div class="val">1</div><div class="delta down">Wi-Fi router — In progress</div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Next shuttle</div>
+              <div class="kpi-card" style="padding:0;"><div class="val">1:00 PM</div><div class="delta up">JKUAT Karen Campus route</div></div>
+            </div>
+          </div>
+
+          <div class="page-grid cols-2">
+            <div class="card">
+              <div class="card-title row">Recent activity <a href="#" class="badge badge-slate" onclick="goPage('resident','wallet')">View wallet</a></div>
+              <div class="list-row"><div><div>Rent payment received</div><div class="meta">3 June 2026</div></div><div class="mono">+ KSh 18,500</div></div>
+              <div class="list-row"><div><div>Laundrymart — Machine B booked</div><div class="meta">12 June 2026</div></div><div class="badge badge-success">Confirmed</div></div>
+              <div class="list-row"><div><div>Maintenance ticket #2291 submitted</div><div class="meta">14 June 2026</div></div><div class="badge badge-warning">In progress</div></div>
+              <div class="list-row"><div><div>Guest invite — Brian Otieno</div><div class="meta">15 June 2026</div></div><div class="badge badge-success">Approved</div></div>
+            </div>
+            <div class="card">
+              <div class="card-title row">Notices <a href="#" class="badge badge-slate" onclick="goPage('resident','notices')">View all</a></div>
+              <div class="list-row"><div><div>Water maintenance — Block A</div><div class="meta">Today, 9:00 AM – 1:00 PM</div></div></div>
+              <div class="list-row"><div><div>Laundry room upgrade complete</div><div class="meta">Block B, Block C</div></div></div>
+              <div class="list-row"><div><div>Term 2 welcome session</div><div class="meta">Common room, Fri 6:00 PM</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MY ROOM -->
+        <div class="page" id="res-room">
+          <div class="page-grid cols-2">
+            <div class="pod-card" style="padding:28px;">
+              <div class="eyebrow">Room type</div>
+              <h3 style="font-size:22px;margin:10px 0 4px;">Twin Sharing Pod</h3>
+              <p style="color:var(--slate);margin-bottom:20px;">Pod B-12 · Block B, 2nd Floor</p>
+              <div class="list-row"><div>Lease start</div><div class="mono">3 Jan 2026</div></div>
+              <div class="list-row"><div>Lease end</div><div class="mono">15 Dec 2026</div></div>
+              <div class="list-row"><div>Monthly rent</div><div class="mono">KSh 18,500</div></div>
+              <div class="list-row"><div>Roommate</div><div>Mercy Wambui</div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Amenities</div>
+              <div class="list-row"><div>Wi-Fi (Pod-wide)</div><div class="badge badge-success">Included</div></div>
+              <div class="list-row"><div>Study desk &amp; chair</div><div class="badge badge-success">Included</div></div>
+              <div class="list-row"><div>Wardrobe</div><div class="badge badge-success">Included</div></div>
+              <div class="list-row"><div>Air conditioning</div><div class="badge badge-success">Included</div></div>
+              <div class="list-row"><div>En-suite bathroom</div><div class="badge badge-success">Included</div></div>
+              <div class="list-row"><div>Mini fridge</div><div class="badge badge-slate">Add-on</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WALLET -->
+        <div class="page" id="res-wallet">
+          <div class="page-grid cols-3" style="margin-bottom:20px;">
+            <div class="balance-card">
+              <div class="mc-label">Wallet balance</div>
+              <div class="mc-amount">KSh 2,300</div>
+              <div class="mc-sub">Last topped up 10 June</div>
+              <div class="btn-row"><button class="btn btn-amber btn-sm">Top up</button></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Rent balance</div>
+              <div class="kpi-card" style="padding:0;"><div class="val">KSh 18,500</div><div class="delta down">Due 1 July 2026</div></div>
+              <button class="btn btn-primary btn-sm btn-block" style="margin-top:16px;">Pay rent now</button>
+            </div>
+            <div class="card">
+              <div class="card-title">This month</div>
+              <div class="kpi-card" style="padding:0;"><div class="val">KSh 18,500</div><div class="delta up">Paid on time</div></div>
+            </div>
+          </div>
+
+          <div class="card table-card">
+            <div class="card-title">Transaction history</div>
+            <table>
+              <tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th><th></th></tr>
+              <tr><td>3 Jun 2026</td><td>Rent payment — June</td><td class="mono">KSh 18,500</td><td><span class="badge badge-success">Paid</span></td><td><a href="#" class="badge badge-slate">Receipt</a></td></tr>
+              <tr><td>10 Jun 2026</td><td>Wallet top-up</td><td class="mono">KSh 2,300</td><td><span class="badge badge-success">Completed</span></td><td><a href="#" class="badge badge-slate">Receipt</a></td></tr>
+              <tr><td>12 Jun 2026</td><td>Laundrymart — Machine B</td><td class="mono">KSh 100</td><td><span class="badge badge-success">Completed</span></td><td><a href="#" class="badge badge-slate">Receipt</a></td></tr>
+              <tr><td>3 May 2026</td><td>Rent payment — May</td><td class="mono">KSh 18,500</td><td><span class="badge badge-success">Paid</span></td><td><a href="#" class="badge badge-slate">Receipt</a></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- GUESTS -->
+        <div class="page" id="res-guests">
+          <div class="page-grid cols-2">
+            <div class="card">
+              <div class="card-title">Invite a guest</div>
+              <div class="form-row"><label>Guest name</label><input type="text" placeholder="e.g. Brian Otieno"></div>
+              <div class="form-grid">
+                <div class="form-row"><label>Visit date</label><input type="text" placeholder="22 June 2026"></div>
+                <div class="form-row"><label>Phone number</label><input type="text" placeholder="07xx xxx xxx"></div>
+              </div>
+              <button class="btn btn-primary btn-block">Send invitation</button>
+            </div>
+            <div class="card">
+              <div class="card-title">Upcoming &amp; past guests</div>
+              <div class="list-row"><div><div>Brian Otieno</div><div class="meta">22 June 2026</div></div><div class="badge badge-success">Approved</div></div>
+              <div class="list-row"><div><div>Aisha Mohamed</div><div class="meta">25 June 2026</div></div><div class="badge badge-warning">Pending</div></div>
+              <div class="list-row"><div><div>Kevin Mwangi</div><div class="meta">2 June 2026</div></div><div class="badge badge-slate">Visited</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SERVICES -->
+        <div class="page" id="res-services">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="equip" onclick="goTab(this,'equip')">Equipment</button>
+            <button class="tab-btn" data-tab="laundry" onclick="goTab(this,'laundry')">Laundrymart</button>
+            <button class="tab-btn" data-tab="transport" onclick="goTab(this,'transport')">Transport</button>
+          </div>
+
+          <div class="tab-panel active" id="tab-equip">
+            <div class="card table-card">
+              <div class="card-title">Borrow equipment</div>
+              <table>
+                <tr><th>Item</th><th>Available</th><th>Borrow period</th><th></th></tr>
+                <tr><td>TV remote</td><td><span class="badge badge-success">Available</span></td><td>24 hours</td><td><button class="btn btn-sm btn-ghost">Borrow</button></td></tr>
+                <tr><td>Extension cable</td><td><span class="badge badge-success">Available</span></td><td>48 hours</td><td><button class="btn btn-sm btn-ghost">Borrow</button></td></tr>
+                <tr><td>Iron box</td><td><span class="badge badge-warning">1 left</span></td><td>3 hours</td><td><button class="btn btn-sm btn-ghost">Borrow</button></td></tr>
+                <tr><td>Study lamp</td><td><span class="badge badge-danger">Out</span></td><td>—</td><td><button class="btn btn-sm btn-ghost" disabled>Borrow</button></td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-laundry">
+            <div class="card">
+              <div class="card-title">Today — Machine B slots</div>
+              <div class="slot-grid">
+                <div class="slot taken"><span class="t">8:00</span>Booked</div>
+                <div class="slot free"><span class="t">10:00</span>Open</div>
+                <div class="slot free"><span class="t">12:00</span>Open</div>
+                <div class="slot taken"><span class="t">2:00</span>Booked</div>
+                <div class="slot free"><span class="t">4:00</span>Open</div>
+                <div class="slot free"><span class="t">6:00</span>Open</div>
+                <div class="slot taken"><span class="t">8:00</span>Booked</div>
+                <div class="slot free"><span class="t">9:30</span>Open</div>
+              </div>
+              <button class="btn btn-primary btn-sm" style="margin-top:18px;">Book 4:00 PM slot — KSh 100</button>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-transport">
+            <div class="card table-card">
+              <div class="card-title">Shuttle schedule</div>
+              <table>
+                <tr><th>Route</th><th>Departs</th><th>Next stop</th><th>Seats</th></tr>
+                <tr><td>JKUAT Karen Campus</td><td class="mono">7:00 AM</td><td>Main Gate</td><td><span class="badge badge-success">12 open</span></td></tr>
+                <tr><td>JKUAT Karen Campus</td><td class="mono">1:00 PM</td><td>Main Gate</td><td><span class="badge badge-warning">4 open</span></td></tr>
+                <tr><td>Westlands / Adams Arcade</td><td class="mono">6:00 PM</td><td>Adams Arcade</td><td><span class="badge badge-success">9 open</span></td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TICKETS -->
+        <div class="page" id="res-tickets">
+          <div class="page-grid cols-2">
+            <div class="card">
+              <div class="card-title">Submit a ticket</div>
+              <div class="form-row"><label>Category</label>
+                <select><option>Maintenance fault</option><option>Property damage</option><option>Noise complaint</option><option>Other</option></select>
+              </div>
+              <div class="form-row"><label>Description</label><textarea placeholder="Describe the issue..."></textarea></div>
+              <button class="btn btn-primary btn-block">Submit ticket</button>
+            </div>
+            <div class="card">
+              <div class="card-title">Your tickets</div>
+              <div class="list-row"><div><div>Wi-Fi router not working</div><div class="meta">Pod B-12 · #2291</div></div><div class="badge badge-warning">In progress</div></div>
+              <div class="list-row"><div><div>Leaking tap, shared bathroom</div><div class="meta">Block B · #2204</div></div><div class="badge badge-success">Resolved</div></div>
+              <div class="list-row"><div><div>Broken wardrobe hinge</div><div class="meta">Pod B-12 · #2117</div></div><div class="badge badge-success">Resolved</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTICES -->
+        <div class="page" id="res-notices">
+          <div class="page-grid cols-2">
+            <div class="card">
+              <div class="card-title">Notice board</div>
+              <div class="list-row"><div><div>Water maintenance — Block A</div><div class="meta">Today, 9:00 AM – 1:00 PM</div></div></div>
+              <div class="list-row"><div><div>Laundry room upgrade complete</div><div class="meta">Block B, Block C</div></div></div>
+              <div class="list-row"><div><div>Term 2 welcome session</div><div class="meta">Common room, Fri 6:00 PM</div></div></div>
+              <div class="list-row"><div><div>Quarterly fire drill</div><div class="meta">All blocks, 28 June</div></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Follow Adana Student Pods</div>
+              <div class="list-row"><div>Instagram — @adanastudentpods</div><button class="btn btn-sm btn-ghost">Follow</button></div>
+              <div class="list-row"><div>WhatsApp community channel</div><button class="btn btn-sm btn-ghost">Join</button></div>
+              <div class="list-row"><div>YouTube — pod tours &amp; events</div><button class="btn btn-sm btn-ghost">Subscribe</button></div>
+              <div class="list-row"><div>TikTok — @adanapods</div><button class="btn btn-sm btn-ghost">Follow</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="page" id="res-profile">
+          <div class="card" style="max-width:560px;">
+            <div class="card-title">Profile settings</div>
+            <div class="form-grid">
+              <div class="form-row"><label>Full name</label><input type="text" value="Faith Wanjiru"></div>
+              <div class="form-row"><label>Phone number</label><input type="text" value="0712 345 678"></div>
+            </div>
+            <div class="form-row"><label>Email</label><input type="text" value="faith.wanjiru@example.com"></div>
+            <div class="form-row"><label>Emergency contact</label><input type="text" value="0798 765 432 — Jane Wanjiru (Mother)"></div>
+            <button class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= ADMIN DASHBOARD ======================= -->
+<div class="view" id="view-admin">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="mark">PL</span> PodLink</div>
+      <div class="side-section-label">Admin</div>
+      <nav class="side-nav" id="admin-nav">
+        <button class="side-link active" data-page="overview" onclick="goPage('admin','overview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Overview</button>
+        <button class="side-link" data-page="rent" onclick="goPage('admin','rent')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h18M3 7v11a2 2 0 002 2h14a2 2 0 002-2V7M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2"/></svg> Rent Payment Management</button>
+        <button class="side-link" data-page="automation" onclick="goPage('admin','automation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.55 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09a1.7 1.7 0 001.55-1 1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34h0a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.55h0a1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87v0a1.7 1.7 0 001.55 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.55 1z"/></svg> Automation Settings</button>
+        <button class="side-link" data-page="receipts" onclick="goPage('admin','receipts')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h9l3 3v17l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/></svg> Receipts</button>
+        <button class="side-link" data-page="tickets" onclick="goPage('admin','tickets')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4m0 4h.01M10.3 3.86L1.8 18a1 1 0 00.86 1.5h18.7a1 1 0 00.86-1.5L13.7 3.86a1 1 0 00-1.73 0z"/></svg> Ticket Management</button>
+        <button class="side-link" data-page="residents" onclick="goPage('admin','residents')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 20h5v-1a4 4 0 00-4-4h-1M9 20H4v-1a4 4 0 014-4h2a4 4 0 014 4v1M14 7a3 3 0 11-6 0 3 3 0 016 0zM21 7a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg> Resident Directory</button>
+      </nav>
+      <div class="sidebar-foot">
+        <a class="exit-link" href="#" onclick="goTo('landing')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 19l-7-7 7-7M3 12h18"/></svg> Exit demo</a>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <div class="app-topbar">
+        <div class="topbar-title" id="admin-title"><h1>Overview</h1><span>Adana Student Pods · All blocks</span></div>
+        <div class="topbar-right">
+          <button class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg><span class="ping"></span></button>
+          <div class="user-chip"><div class="avatar" style="background:var(--amber-tint);color:var(--amber-dark);">JM</div><div><div class="name">Joseph Mwaura</div><div class="role">Property Admin</div></div></div>
+        </div>
+      </div>
+
+      <div class="app-content">
+
+        <!-- OVERVIEW -->
+        <div class="page active" id="adm-overview">
+          <div class="page-grid cols-4" style="margin-bottom:20px;">
+            <div class="card kpi-card"><div class="lbl">Occupancy rate</div><div class="val">92%</div><div class="delta up">+3% vs last month</div></div>
+            <div class="card kpi-card"><div class="lbl">Rent collected (June)</div><div class="val">KSh 1.42M</div><div class="delta up">87% of expected</div></div>
+            <div class="card kpi-card"><div class="lbl">Open tickets</div><div class="val">14</div><div class="delta down">5 overdue &gt;48h</div></div>
+            <div class="card kpi-card"><div class="lbl">Active automations</div><div class="val">3</div><div class="delta up">All running</div></div>
+          </div>
+
+          <div class="page-grid cols-2">
+            <div class="card">
+              <div class="card-title">Rent collected — last 6 months</div>
+              <div style="display:flex;gap:14px;height:140px;padding-top:10px;">
+                <div style="flex:1;height:140px;display:flex;align-items:flex-end;"><div style="background:var(--teal);width:100%;height:70%;border-radius:8px 8px 0 0;"></div></div>
+                <div style="flex:1;height:140px;display:flex;align-items:flex-end;"><div style="background:var(--teal);width:100%;height:78%;border-radius:8px 8px 0 0;"></div></div>
+                <div style="flex:1;height:140px;display:flex;align-items:flex-end;"><div style="background:var(--teal);width:100%;height:65%;border-radius:8px 8px 0 0;"></div></div>
+                <div style="flex:1;height:140px;display:flex;align-items:flex-end;"><div style="background:var(--teal);width:100%;height:82%;border-radius:8px 8px 0 0;"></div></div>
+                <div style="flex:1;height:140px;display:flex;align-items:flex-end;"><div style="background:var(--teal);width:100%;height:90%;border-radius:8px 8px 0 0;"></div></div>
+                <div style="flex:1;height:140px;display:flex;align-items:flex-end;"><div style="background:var(--amber);width:100%;height:87%;border-radius:8px 8px 0 0;"></div></div>
+              </div>
+              <div style="display:flex;gap:14px;margin-top:8px;">
+                <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);">Jan</div>
+                <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);">Feb</div>
+                <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);">Mar</div>
+                <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);">Apr</div>
+                <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);">May</div>
+                <div style="flex:1;text-align:center;font-size:11px;color:var(--slate-light);">Jun</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Recent activity</div>
+              <div class="list-row"><div><div>Rent reminder sent — 42 residents</div><div class="meta">Automation · Today, 7:00 AM</div></div></div>
+              <div class="list-row"><div><div>Ticket #2291 assigned to Maintenance</div><div class="meta">Today, 9:14 AM</div></div></div>
+              <div class="list-row"><div><div>Receipt #R-3142 issued — Faith Wanjiru</div><div class="meta">Today, 11:02 AM</div></div></div>
+              <div class="list-row"><div><div>Overdue escalation — Pod C-04</div><div class="meta">Yesterday, 6:00 PM</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RENT MANAGEMENT -->
+        <div class="page" id="adm-rent">
+          <div class="card table-card">
+            <div class="card-title row">Rent payments — June 2026 <input type="text" placeholder="Search resident..." style="width:200px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;"></div>
+            <table>
+              <tr><th>Resident</th><th>Pod</th><th>Amount due</th><th>Status</th><th>Due date</th><th></th></tr>
+              <tr><td>Faith Wanjiru</td><td>B-12</td><td class="mono">KSh 18,500</td><td><span class="badge badge-success">Paid</span></td><td>1 Jun</td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
+              <tr><td>Brian Otieno</td><td>A-03</td><td class="mono">KSh 17,000</td><td><span class="badge badge-success">Paid</span></td><td>1 Jun</td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
+              <tr><td>Daniel Kiptoo</td><td>C-04</td><td class="mono">KSh 17,000</td><td><span class="badge badge-danger">Overdue</span></td><td>1 Jun</td><td><button class="btn btn-sm btn-ghost">Send reminder</button></td></tr>
+              <tr><td>Grace Achieng</td><td>B-07</td><td class="mono">KSh 18,500</td><td><span class="badge badge-warning">Pending</span></td><td>1 Jun</td><td><button class="btn btn-sm btn-ghost">Send reminder</button></td></tr>
+              <tr><td>Mercy Wambui</td><td>B-12</td><td class="mono">KSh 18,500</td><td><span class="badge badge-success">Paid</span></td><td>1 Jun</td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
+              <tr><td>Kevin Mwangi</td><td>A-09</td><td class="mono">KSh 17,000</td><td><span class="badge badge-danger">Overdue</span></td><td>1 Jun</td><td><button class="btn btn-sm btn-ghost">Send reminder</button></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- AUTOMATION -->
+        <div class="page" id="adm-automation">
+          <div class="card" style="max-width:680px;">
+            <div class="card-title row">Automation rules <button class="btn btn-sm btn-primary">Add automation</button></div>
+            <div class="list-row"><div><div>Rent reminder — 3 days before due</div><div class="meta">SMS + in-app · sent to all active residents</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+            <div class="list-row"><div><div>Auto-generate receipt on payment</div><div class="meta">Triggered instantly on successful payment</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+            <div class="list-row"><div><div>Overdue escalation — after 5 days</div><div class="meta">Flags resident and notifies front desk</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+            <div class="list-row"><div><div>Ticket auto-assign by category</div><div class="meta">Routes maintenance tickets to on-duty staff</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+          </div>
+        </div>
+
+        <!-- RECEIPTS -->
+        <div class="page" id="adm-receipts">
+          <div class="card table-card">
+            <div class="card-title row">Issued receipts <input type="text" placeholder="Search receipt #..." style="width:200px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;"></div>
+            <table>
+              <tr><th>Receipt #</th><th>Resident</th><th>Amount</th><th>Date issued</th><th></th></tr>
+              <tr><td class="mono">R-3142</td><td>Faith Wanjiru</td><td class="mono">KSh 18,500</td><td>3 Jun 2026</td><td><button class="btn btn-sm btn-ghost">Download</button></td></tr>
+              <tr><td class="mono">R-3141</td><td>Brian Otieno</td><td class="mono">KSh 17,000</td><td>3 Jun 2026</td><td><button class="btn btn-sm btn-ghost">Download</button></td></tr>
+              <tr><td class="mono">R-3138</td><td>Mercy Wambui</td><td class="mono">KSh 18,500</td><td>2 Jun 2026</td><td><button class="btn btn-sm btn-ghost">Download</button></td></tr>
+              <tr><td class="mono">R-3127</td><td>Aisha Mohamed</td><td class="mono">KSh 17,000</td><td>1 Jun 2026</td><td><button class="btn btn-sm btn-ghost">Download</button></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- TICKET MANAGEMENT -->
+        <div class="page" id="adm-tickets">
+          <div class="page-grid cols-3">
+            <div class="card">
+              <div class="card-title">Open · 6</div>
+              <div class="list-row"><div><div>Wi-Fi router not working</div><div class="meta">Pod B-12 · #2291</div></div></div>
+              <div class="list-row"><div><div>Broken window latch</div><div class="meta">Pod C-04 · #2294</div></div></div>
+              <div class="list-row"><div><div>AC not cooling</div><div class="meta">Pod A-09 · #2297</div></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">In progress · 5</div>
+              <div class="list-row"><div><div>Leaking shared bathroom tap</div><div class="meta">Block B · #2204</div></div></div>
+              <div class="list-row"><div><div>Noise complaint</div><div class="meta">Pod A-03 · #2288</div></div></div>
+              <div class="list-row"><div><div>Door lock jammed</div><div class="meta">Pod B-07 · #2290</div></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Resolved · 3</div>
+              <div class="list-row"><div><div>Broken wardrobe hinge</div><div class="meta">Pod B-12 · #2117</div></div></div>
+              <div class="list-row"><div><div>Laundry machine fault</div><div class="meta">Block C · #2098</div></div></div>
+              <div class="list-row"><div><div>Corridor light out</div><div class="meta">Block A · #2076</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESIDENT DIRECTORY -->
+        <div class="page" id="adm-residents">
+          <div class="card table-card">
+            <div class="card-title row">All residents <input type="text" placeholder="Search resident..." style="width:200px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;"></div>
+            <table>
+              <tr><th>Name</th><th>Pod</th><th>Phone</th><th>Wallet</th><th>Status</th></tr>
+              <tr><td>Faith Wanjiru</td><td>B-12</td><td class="mono">0712 345 678</td><td class="mono">KSh 2,300</td><td><span class="badge badge-success">Active</span></td></tr>
+              <tr><td>Brian Otieno</td><td>A-03</td><td class="mono">0723 456 789</td><td class="mono">KSh 1,150</td><td><span class="badge badge-success">Active</span></td></tr>
+              <tr><td>Aisha Mohamed</td><td>A-09</td><td class="mono">0701 234 567</td><td class="mono">KSh 600</td><td><span class="badge badge-success">Active</span></td></tr>
+              <tr><td>Daniel Kiptoo</td><td>C-04</td><td class="mono">0734 567 890</td><td class="mono">KSh 0</td><td><span class="badge badge-danger">Overdue</span></td></tr>
+              <tr><td>Grace Achieng</td><td>B-07</td><td class="mono">0745 678 901</td><td class="mono">KSh 350</td><td><span class="badge badge-warning">Pending</span></td></tr>
+              <tr><td>Mercy Wambui</td><td>B-12</td><td class="mono">0756 789 012</td><td class="mono">KSh 2,300</td><td><span class="badge badge-success">Active</span></td></tr>
+              <tr><td>Kevin Mwangi</td><td>A-09</td><td class="mono">0767 890 123</td><td class="mono">KSh 0</td><td><span class="badge badge-danger">Overdue</span></td></tr>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function goTo(view){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  window.scrollTo(0,0);
+}
+const titles = {
+  resident: { dash:['Dashboard','Pod B-12 · Block B'], room:['My Room','Pod B-12 · Block B'], wallet:['Wallet & Payments','Pod B-12 · Block B'], guests:['Guest Invitations','Pod B-12 · Block B'], services:['Services','Pod B-12 · Block B'], tickets:['Maintenance & Complaints','Pod B-12 · Block B'], notices:['Notices & Community','Pod B-12 · Block B'], profile:['Profile Settings','Pod B-12 · Block B'] },
+  admin: { overview:['Overview','Adana Student Pods · All blocks'], rent:['Rent Payment Management','Adana Student Pods · All blocks'], automation:['Automation Settings','Adana Student Pods · All blocks'], receipts:['Receipts','Adana Student Pods · All blocks'], tickets:['Ticket Management','Adana Student Pods · All blocks'], residents:['Resident Directory','Adana Student Pods · All blocks'] }
+};
+function goTo(view, page){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  window.scrollTo(0,0);
+  if(page) goPage(view, page);
+}
+function goPage(view, page){
+  document.querySelectorAll('#' + view + '-nav .side-link').forEach(l => l.classList.remove('active'));
+  document.querySelector('#' + view + '-nav [data-page="' + page + '"]').classList.add('active');
+  const prefix = view === 'resident' ? 'res' : 'adm';
+  document.querySelectorAll('#view-' + view + ' .page').forEach(p => p.classList.remove('active'));
+  document.getElementById(prefix + '-' + page).classList.add('active');
+  const t = titles[view][page];
+  document.getElementById(view + '-title').innerHTML = '<h1>' + t[0] + '</h1><span>' + t[1] + '</span>';
+  document.querySelector('#view-' + view + ' .app-content').scrollTo(0,0);
+  window.scrollTo(0,0);
+}
+function goTab(btn, tab){
+  const tabsWrap = btn.closest('.tabs');
+  tabsWrap.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const page = btn.closest('.page');
+  page.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+</script>
+</body>
+</html>
